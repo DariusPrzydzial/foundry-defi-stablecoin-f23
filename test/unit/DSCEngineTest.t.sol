@@ -159,7 +159,7 @@ contract DSCEngineTest is StdCheats, Test {
         assertEq(userBalance, 0);
     }
 
-    function testCanDepositedCollateralAndGetAccountInfo() public depositedCollateral {
+    function testCanDepositCollateralAndGetAccountInfo() public depositedCollateral {
         (uint256 totalDscMinted, uint256 collateralValueInUsd) = dsce.getAccountInformation(user);
         uint256 expectedDepositedAmount = dsce.getTokenAmountFromUsd(weth, collateralValueInUsd);
         assertEq(totalDscMinted, 0);
@@ -173,6 +173,7 @@ contract DSCEngineTest is StdCheats, Test {
     function testRevertsIfMintedDscBreaksHealthFactor() public {
         (, int256 price,,,) = MockV3Aggregator(ethUsdPriceFeed).latestRoundData();
         amountToMint = (amountCollateral * (uint256(price) * dsce.getAdditionalFeedPrecision())) / dsce.getPrecision();
+        console.log("Quoted ETH price: %s", uint256(price) * dsce.getAdditionalFeedPrecision() / dsce.getPrecision());
         vm.startPrank(user);
         ERC20Mock(weth).approve(address(dsce), amountCollateral);
 
@@ -197,7 +198,7 @@ contract DSCEngineTest is StdCheats, Test {
     }
 
     ///////////////////////////////////
-    // mintDsc Tests //
+    // mintDsc Tests                 //
     ///////////////////////////////////
     // This test needs it's own custom setup
     function testRevertsIfMintFails() public {
